@@ -30,10 +30,12 @@ namespace MRFractal
             var window = this;
             //window.WindowStyle = WindowStyle.None;
             //window.ResizeMode = ResizeMode.NoResize;
-            window.Left = 0;
-            window.Top = 0;
-            window.Width = SystemParameters.VirtualScreenWidth/2;
-            window.Height = SystemParameters.VirtualScreenHeight/2;
+            
+            //window.Left = 0;
+            //window.Top = 0;
+            
+            //window.Width = SystemParameters.VirtualScreenWidth/2;
+            //window.Height = SystemParameters.VirtualScreenHeight/2;
             //window.Topmost = true;
 
             BigDecimal.AlwaysTruncate = true;
@@ -47,7 +49,8 @@ namespace MRFractal
         private void Window_Initialized(object sender, EventArgs e)
         {
 
-            model = new MandelViewModel((int)Width, (int)Height);
+
+            model = new MandelViewModel(100, 100);
             this.DataContext = model;
             //{
             //    for (int i = 0; i < 1; i++)
@@ -85,36 +88,19 @@ namespace MRFractal
                 }
             }
 
-            {
-                for (int i = 0; i < 2; i++)
-                {
-                    var Updater = new System.Threading.Thread(() =>
-                    {
-                        while (alive)
-                        {
-                            model.UpdatePixelDepthMap();
-                            Console.WriteLine("Calcs done");
-                        }
-                    });
-                    Updater.Start();
-                }
-            }
-
             //for (int i = 0; i < 6; i++)
             {
                 var Refresher = new System.Threading.Thread(() =>
             {
-                Random rnd = new Random();
                 while (alive)
                 {
-                    model.UpdateBitMap();
-                    var lowbitmap = model.bitmap;
+                    model.UpdateColorPixelBitMap();
                     //model.NewColorMapping();
                     try
                     {
                         this.Dispatcher.Invoke(() =>
                         {
-                            MainImage.Source = lowbitmap.GetBitMapSource();
+                            MainImage.Source = model.PerPixelColorStore.GetBitMapSource();
                             Console.WriteLine("New Pic Calculated");
                         }
                         );
@@ -218,5 +204,12 @@ namespace MRFractal
         {
             alive = false;
         }
+
+        private void MainImage_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.model = new MandelViewModel((int)e.NewSize.Width, (int)e.NewSize.Height);
+            this.DataContext = this.model;
+        }
+
     }
 }

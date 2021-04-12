@@ -21,9 +21,9 @@ namespace MRFractal
 
         IContiniusAproximator<int, BigDecimal> DepthData;
 
-        public LowBitMap bitmap;
+        public PerPixelColorStore PerPixelColorStore;
 
-        PixelDepthData PerPixelDepth;
+        PerPixelDepthStore PerPixelDepthStore;
 
 
         bool directMode = true;
@@ -48,9 +48,9 @@ namespace MRFractal
             pixelWidth = width;
             pixelHeigth = heigth;
 
-            PerPixelDepth = new PixelDepthData(pixelWidth, pixelHeigth);
+            PerPixelDepthStore = new PerPixelDepthStore(pixelWidth, pixelHeigth);
 
-            bitmap = new LowBitMap(pixelWidth, pixelHeigth);
+            PerPixelColorStore = new PerPixelColorStore(pixelWidth, pixelHeigth);
             //DepthData = new SimpleDepthCache();
             ResetDepthCache();
         }
@@ -76,7 +76,7 @@ namespace MRFractal
             int translateY = (int)point.Y - (pixelHeigth / 2);
 
 
-            PerPixelDepth.Translate(translateX, translateY);
+            PerPixelDepthStore.Translate(translateX, translateY);
 
             
         }
@@ -85,7 +85,7 @@ namespace MRFractal
         {
             this.size /= factor;
 
-            PerPixelDepth.Zoom(factor);
+            PerPixelDepthStore.Zoom(factor);
         }
 
         public void UpdateDepthMap(int count=100)
@@ -113,24 +113,19 @@ namespace MRFractal
 
         public void ResetPerPixelDepthMap()
         {
-            this.PerPixelDepth = new PixelDepthData(pixelWidth, pixelHeigth);
-        }
-
-        public void ResetRealData()
-        {
-            this.PerPixelDepth.ResetIsRealData();
+            this.PerPixelDepthStore = new PerPixelDepthStore(pixelWidth, pixelHeigth);
         }
 
 
-        public void UpdateBitMap()
+        public void UpdateColorPixelBitMap()
         {
             for (int x = 0; x < pixelWidth; x++)
             {
                 for (int y = 0; y < pixelHeigth; y++)
                 {
                     
-                    int depth = this.PerPixelDepth.PixelDepthMap[x, y];
-                    bitmap.SetPixel(x, y, colors.GetRed(depth), colors.GetGreen(depth), colors.GetBlue(depth));
+                    int depth = this.PerPixelDepthStore[x, y];
+                    PerPixelColorStore.SetPixel(x, y, colors.GetRed(depth), colors.GetGreen(depth), colors.GetBlue(depth));
                 }
             }
         }
@@ -142,21 +137,21 @@ namespace MRFractal
             {
                 int x = rnd.Next(pixelWidth);
                 int y = rnd.Next(pixelHeigth);
-                if(this.PerPixelDepth.isRealData[x,y]==false)
+                if(this.PerPixelDepthStore.isRealData[x,y]==false)
                 {
                     if (DirectMode)
                     {
                         var xx = XPixelToReal(x);
                         var yy = YPixelToIm(y);
                         //int depth = MandelFractal.Julia(xx, yy, xx, yy, 1000);
-                        int depth = NativDoubleMode? MandelFractal.Julia((double)xx, (double)yy, (double)xx, (double)yy, MaxIteration) : MandelFractal.JuliaBigFloat(xx, yy, xx, yy, MaxIteration);
-                        this.PerPixelDepth.NewDepthData(x, y, depth, true);
+                        int depth = NativDoubleMode ? MandelFractal.Julia((double)xx, (double)yy, (double)xx, (double)yy, MaxIteration) : MandelFractal.JuliaBigFloat(xx, yy, xx, yy, MaxIteration);
+                        this.PerPixelDepthStore.NewDepthData(x, y, depth, true);
                     }
                     else
                     {
                         
                         int depth = DepthData[XPixelToReal(x), YPixelToIm(y)];
-                        this.PerPixelDepth.NewDepthData(x, y, depth, true);
+                        this.PerPixelDepthStore.NewDepthData(x, y, depth, true);
                     }
                 }
             }
@@ -165,13 +160,13 @@ namespace MRFractal
         public void NewColorMapping()
         {
             this.colors = new ColorMapping(ColorMode.Random);
-            UpdateBitMap();
+            UpdateColorPixelBitMap();
         }
 
         public void NewMaxIteraition(int newMax)
         {
             this.MaxIteration = newMax;
-            this.PerPixelDepth.ResetIsRealData();
+            this.PerPixelDepthStore.ResetIsRealData();
         }
 
         BigDecimal XPixelToReal(int x) => re_center + ((2 * size) / pixelWidth) * (x - (pixelWidth / 2));

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MRFractal
 {
-    class PixelDepthData
+    class PerPixelDepthStore
     {
         public int pixelWidth;
         public int pixelHeigth;
@@ -23,7 +23,7 @@ namespace MRFractal
         }
 
 
-        public PixelDepthData(int width, int height)
+        public PerPixelDepthStore(int width, int height)
         {
             pixelWidth = width;
             pixelHeigth = height;

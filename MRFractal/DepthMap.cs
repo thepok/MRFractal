@@ -33,9 +33,9 @@ namespace MRFractal
             }
         }
 
-        public LowBitMap GetLowBitMap()
+        public PerPixelColorStore GetLowBitMap()
         {
-            var bitmap = new LowBitMap(width, height);
+            var bitmap = new PerPixelColorStore(width, height);
             
             ColorMapping colors = new ColorMapping();
             

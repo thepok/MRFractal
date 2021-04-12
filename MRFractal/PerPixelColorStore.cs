@@ -7,7 +7,7 @@ using System.Windows.Media.Imaging;
 
 namespace MRFractal
 {
-    public class LowBitMap
+    public class PerPixelColorStore
     {
         public int width;
         public int height;
@@ -15,7 +15,7 @@ namespace MRFractal
         public int stride;
 
         byte[] imgdata;
-        public LowBitMap(int width = 800, int height = 800)
+        public PerPixelColorStore(int width = 800, int height = 800)
         {
             this.width = width;
             this.height = height;
