@@ -18,7 +18,7 @@ namespace MRFractal
         /// <summary>
         /// Specifies whether the significant digits should be truncated to the given precision after each operation.
         /// </summary>
-        public static bool AlwaysTruncate = false;
+        public static bool AlwaysTruncate = true;
 
         /// <summary>
         /// Sets the maximum precision of division operations.
