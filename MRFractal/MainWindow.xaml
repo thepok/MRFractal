@@ -5,13 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MRFractal"
         mc:Ignorable="d"
-        Title="MainWindow"  Initialized="Window_Initialized" KeyUp="Window_KeyUp" Closing="Window_Closing">
+        Title="MainWindow"  Initialized="Window_Initialized" KeyUp="Window_KeyUp" Closing="Window_Closing"
+        Width="800" Height="600">
     <Grid>
-        <StackPanel>
-            <CheckBox IsChecked="{Binding DirectMode}">Direkt Mode</CheckBox>
-            <CheckBox IsChecked="{Binding NativDoubleMode}">Nativ Double Mode</CheckBox>
-            <Image x:Name="MainImage" Stretch="Uniform"   MouseLeftButtonDown="MainImage_MouseLeftButtonDown" MouseRightButtonDown="MainImage_MouseRightButtonDown"/>
-            <TextBox x:Name="MaxIteration" Text="{Binding Path=MaxIteration}"></TextBox>
-        </StackPanel>
+        <DockPanel >
+            <CheckBox DockPanel.Dock="Top" IsChecked="{Binding DirectMode}">Direkt Mode</CheckBox>
+            <CheckBox DockPanel.Dock="Top" IsChecked="{Binding NativDoubleMode}">Nativ Double Mode</CheckBox>
+            <TextBox DockPanel.Dock="Top" x:Name="MaxIteration" Text="{Binding Path=MaxIteration}"></TextBox>
+            <TextBox DockPanel.Dock="Top" x:Name="Cords"></TextBox>
+            <Grid>
+                <Image x:Name="MainImage" Stretch="Fill" MouseLeftButtonDown="MainImage_MouseLeftButtonDown" MouseMove="MainImage_MouseMove" MouseLeftButtonUp="MainImage_MouseLeftButtonUp" MouseRightButtonDown="MainImage_MouseRightButtonDown" SizeChanged="MainImage_SizeChanged" />
+                <Rectangle x:Name="SelectionRectangle" Visibility="Hidden" Width="100" Height="50" Margin="322,176,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" MouseMove="MainImage_MouseMove" MouseLeftButtonUp="MainImage_MouseLeftButtonUp" MouseRightButtonDown="MainImage_MouseRightButtonDown">
+                    <Rectangle.Fill>
+                        <SolidColorBrush Color="Black" Opacity="0.25"/>
+                    </Rectangle.Fill>
+                </Rectangle>
+            </Grid>
+        </DockPanel>
     </Grid>
 </Window>

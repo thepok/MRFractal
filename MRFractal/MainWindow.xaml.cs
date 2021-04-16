@@ -22,7 +22,7 @@ namespace MRFractal
     public partial class MainWindow : Window
     {
 
-        public MandelViewModel model;
+        public PixelMandelViewModel model;
         public MainWindow()
         {
 
@@ -30,10 +30,12 @@ namespace MRFractal
             var window = this;
             //window.WindowStyle = WindowStyle.None;
             //window.ResizeMode = ResizeMode.NoResize;
-            window.Left = 0;
-            window.Top = 0;
-            window.Width = SystemParameters.VirtualScreenWidth/2;
-            window.Height = SystemParameters.VirtualScreenHeight/2;
+            
+            //window.Left = 0;
+            //window.Top = 0;
+            
+            //window.Width = SystemParameters.VirtualScreenWidth/2;
+            //window.Height = SystemParameters.VirtualScreenHeight/2;
             //window.Topmost = true;
 
             BigDecimal.AlwaysTruncate = true;
@@ -47,7 +49,8 @@ namespace MRFractal
         private void Window_Initialized(object sender, EventArgs e)
         {
 
-            model = new MandelViewModel((int)Width, (int)Height);
+
+            model = new PixelMandelViewModel(100, 100);
             this.DataContext = model;
             //{
             //    for (int i = 0; i < 1; i++)
@@ -72,7 +75,7 @@ namespace MRFractal
                         {
                             if (model.DirectMode == false)
                             {
-                                model.UpdateDepthMap(100);
+                               // model.UpdateDepthMap(100);
                             }
                             else
                             {
@@ -85,47 +88,34 @@ namespace MRFractal
                 }
             }
 
-            {
-                for (int i = 0; i < 2; i++)
-                {
-                    var Updater = new System.Threading.Thread(() =>
-                    {
-                        while (alive)
-                        {
-                            model.UpdatePixelDepthMap();
-                            Console.WriteLine("Calcs done");
-                        }
-                    });
-                    Updater.Start();
-                }
-            }
-
             //for (int i = 0; i < 6; i++)
             {
                 var Refresher = new System.Threading.Thread(() =>
-            {
-                Random rnd = new Random();
-                while (alive)
                 {
-                    model.UpdateBitMap();
-                    var lowbitmap = model.bitmap;
-                    //model.NewColorMapping();
-                    try
+                    while (alive)
                     {
-                        this.Dispatcher.Invoke(() =>
+                        try
                         {
-                            MainImage.Source = lowbitmap.GetBitMapSource();
-                            Console.WriteLine("New Pic Calculated");
+                            model.UpdateColorPixelBitMap();
                         }
-                        );
+                        catch { };
+                        //model.NewColorMapping();
+                        try
+                        {
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                MainImage.Source = model.PerPixelColorStore.GetBitMapSource();
+                                Console.WriteLine("New Pic Calculated");
+                            }
+                            );
+                        }
+                        catch
+                        {
+                            return;
+                        }
+                        System.Threading.Thread.Sleep(200);
                     }
-                    catch
-                    {
-                        return;
-                    }
-                    System.Threading.Thread.Sleep(200);
-                }
-            });
+                });
                 Refresher.Start();
             }
 
@@ -138,20 +128,6 @@ namespace MRFractal
             //MainImage.Source = bitmap;
         }
 
-        private async void MainImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var PosClick=e.GetPosition((IInputElement)sender);
-
-            model.NewCenterByPixelPos(PosClick);
-            model.Zoom(2);
-            
-            Console.WriteLine($"{model.size} {model.re_center} {model.im_center}");
-            //MainImage.Source = dm.GetLowBitMap().GetBitMapSource();
-            //model.UpdateDepthMap();
-            //MainImage.Source = model.GetLowBitMap().GetBitMapSource();
-             //MainImage.Source = model.GetLowBitMap().GetBitMapSource();
-
-        }
 
         private async void  MainImage_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -159,7 +135,7 @@ namespace MRFractal
 
             model.NewCenterByPixelPos(PosClick);
 
-            Console.WriteLine($"{model.size} {model.re_center} {model.im_center}");
+            //Console.WriteLine($"{model.size} {model.re_center} {model.im_center}");
             //MainImage.Source = dm.GetLowBitMap().GetBitMapSource();
             //Task.Run(() => MainImage.Source = model.GetLowBitMap().GetBitMapSource());
             //MainImage.Source = model.GetLowBitMap().GetBitMapSource();
@@ -195,11 +171,6 @@ namespace MRFractal
                 model.DirectMode = !model.DirectMode;
             }
 
-            if(e.Key==Key.K)
-            {
-                model.ResetDepthCache();
-            }
-
             if (e.Key == Key.O)
             {
                 model.Zoom(0.5);
@@ -218,5 +189,84 @@ namespace MRFractal
         {
             alive = false;
         }
+
+        private void MainImage_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.model.pixelHeigth = (int)e.NewSize.Height;
+            this.model.pixelWidth = (int)e.NewSize.Width;
+            this.model.ResetStores();
+            
+            return;
+        }
+
+
+
+        #region MOUSE
+
+        System.Windows.Point MouseLeftDownPos;
+        bool LeftMouseButtonDown = false;
+
+        private async void MainImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+            MouseLeftDownPos = e.GetPosition((IInputElement)sender);
+            LeftMouseButtonDown = true;
+        }
+
+        private void MainImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            LeftMouseButtonDown = false;
+            SelectionRectangle.Visibility = Visibility.Collapsed;
+            var PosClickUp = e.GetPosition((IInputElement)MainImage);
+
+            if (PosClickUp == MouseLeftDownPos)
+            {
+                model.NewCenterByPixelPos(PosClickUp);
+                //model.im_size /= 2;
+                //model.re_size /= 2;
+                model.Zoom(2);
+            }
+            else
+            {
+
+                var newLeftTop = new Cords() {real= model.XPixelToReal((int)MouseLeftDownPos.X), imaginar = model.YPixelToIm((int)MouseLeftDownPos.Y) };
+                var newRightBottom= new Cords() { real = model.XPixelToReal((int)PosClickUp.X), imaginar = model.YPixelToIm((int)PosClickUp.Y) };
+                model.re_rightbottom = newRightBottom.real;
+                model.im_rightbottom = newRightBottom.imaginar;
+
+                model.re_lefttop = newLeftTop.real;
+                model.im_lefttop = newLeftTop.imaginar;
+
+                model.ResetPerPixelDepthMap();
+            }
+
+            //Console.WriteLine($"{model.size} {model.re_center} {model.im_center}");
+            //MainImage.Source = dm.GetLowBitMap().GetBitMapSource();
+            //model.UpdateDepthMap();
+            //MainImage.Source = model.GetLowBitMap().GetBitMapSource();
+            //MainImage.Source = model.GetLowBitMap().GetBitMapSource();
+        }
+
+        private void MainImage_MouseMove(object sender, MouseEventArgs e)
+        {
+            var PosClick = e.GetPosition((IInputElement)MainImage);
+            Cords.Text = $"Re:{model.XPixelToReal((int)PosClick.X)} Im:{model.YPixelToIm((int)PosClick.Y)}";
+            try
+            {
+                if (LeftMouseButtonDown)
+                {
+                    SelectionRectangle.Visibility = Visibility.Visible;
+                    SelectionRectangle.Margin = new Thickness(MouseLeftDownPos.X, MouseLeftDownPos.Y, 0, 0);
+
+                    
+
+                    SelectionRectangle.Width = PosClick.X - MouseLeftDownPos.X;
+                    SelectionRectangle.Height = PosClick.Y - MouseLeftDownPos.Y;
+                }
+            }
+            catch { }
+        }
+
+        #endregion
     }
 }
