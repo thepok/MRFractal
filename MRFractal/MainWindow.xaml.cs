@@ -94,7 +94,11 @@ namespace MRFractal
                 {
                     while (alive)
                     {
-                        model.UpdateColorPixelBitMap();
+                        try
+                        {
+                            model.UpdateColorPixelBitMap();
+                        }
+                        catch { };
                         //model.NewColorMapping();
                         try
                         {
@@ -188,10 +192,19 @@ namespace MRFractal
 
         private void MainImage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            this.model.pixelHeigth = (int)e.NewSize.Height;
+            this.model.pixelWidth = (int)e.NewSize.Width;
+            this.model.ResetStores();
+            
+            return;
+
             this.model = new PixelMandelViewModel((int)e.NewSize.Width, (int)e.NewSize.Height);
             this.DataContext = this.model;
         }
 
+
+
+        #region MOUSE
 
         System.Windows.Point MouseLeftDownPos;
         bool LeftMouseButtonDown = false;
@@ -256,5 +269,7 @@ namespace MRFractal
             }
             catch { }
         }
+
+        #endregion
     }
 }

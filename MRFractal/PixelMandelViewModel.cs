@@ -52,9 +52,9 @@ namespace MRFractal
 
         }
 
-        private void ResetStores()
+        public void ResetStores()
         {
-            PerPixelDepthStore = new PerPixelDepthStore(pixelWidth, pixelHeigth);
+            ResetPerPixelDepthMap();
             PerPixelColorStore = new PerPixelColorStore(pixelWidth, pixelHeigth);
         }
 
@@ -146,27 +146,6 @@ namespace MRFractal
             PerPixelDepthStore.Zoom(factor);
         }
 
-        //public void UpdateDepthMap(int count=100)
-        //{
-        //    BigDecimal im_min = im_center - im_size;
-        //    BigDecimal im_max = im_center + im_size;
-        //    BigDecimal re_min = re_center - re_size;
-        //    BigDecimal re_max = re_center + re_size;
-
-
-        //    int xpixels = pixelWidth;
-        //    int ypixels = pixelHeigth;
-        //    var rnd = new Random();
-
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        var c_im = im_min + (im_max - im_min) * rnd.NextDouble();
-        //        var c_re = re_min + (re_max - re_min) * rnd.NextDouble();
-
-        //        int depth= NativDoubleMode?MandelFractal.Julia((double)c_re, (double)c_im, (double)c_re, (double)c_im, MaxIteration) :  MandelFractal.JuliaBigFloat(c_re, c_im, c_re, c_im, MaxIteration);
-        //        //Console.WriteLine($"PointDone {depth}");
-        //    }
-        //}
 
         public void ResetPerPixelDepthMap()
         {
@@ -189,21 +168,25 @@ namespace MRFractal
 
         public void UpdatePixelDepthMap()
         {
-            var rnd = new Random();
-            for(int i=0; i<100;i++)
+            try
             {
-                int x = rnd.Next(pixelWidth);
-                int y = rnd.Next(pixelHeigth);
-                if (this.PerPixelDepthStore.isRealData[x, y] == false)
+                var rnd = new Random();
+                for (int i = 0; i < 100; i++)
                 {
-                    var xx = XPixelToReal(x);
-                    var yy = YPixelToIm(y);
-                    //int depth = MandelFractal.Julia(xx, yy, xx, yy, 1000);
-                    int depth = NativDoubleMode ? MandelFractal.Julia((double)xx, (double)yy, (double)xx, (double)yy, MaxIteration) : MandelFractal.JuliaBigFloat(xx, yy, xx, yy, MaxIteration);
-                    this.PerPixelDepthStore.NewDepthData(x, y, depth, true);
+                    int x = rnd.Next(pixelWidth);
+                    int y = rnd.Next(pixelHeigth);
+                    if (this.PerPixelDepthStore.isRealData[x, y] == false)
+                    {
+                        var xx = XPixelToReal(x);
+                        var yy = YPixelToIm(y);
+                        //int depth = MandelFractal.Julia(xx, yy, xx, yy, 1000);
+                        int depth = NativDoubleMode ? MandelFractal.Julia((double)xx, (double)yy, (double)xx, (double)yy, MaxIteration) : MandelFractal.JuliaBigFloat(xx, yy, xx, yy, MaxIteration);
+                        this.PerPixelDepthStore.NewDepthData(x, y, depth, true);
 
+                    }
                 }
             }
+            catch { };
         }
 
         public void NewColorMapping()
