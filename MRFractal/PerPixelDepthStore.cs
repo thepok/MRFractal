@@ -61,9 +61,16 @@ namespace MRFractal
 
         public void NewDepthData(int x, int y, int depth, bool BigPlot = false)
         {
-            isRealData[x, y] = true;
-            PixelDepthMap[x, y] = depth;
-            RealDataDistance[x, y] = 0;
+            if(isRealData[x,y]==false)
+            {
+                isRealData[x, y] = true;
+                PixelDepthMap[x, y] = depth;
+                RealDataDistance[x, y] = 0;
+            }
+            else
+            {
+                PixelDepthMap[x, y]= (PixelDepthMap[x, y]+depth)/2;
+            }
 
             if (BigPlot)
             {

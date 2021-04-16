@@ -41,7 +41,7 @@ namespace MRFractal
         }
         public bool NativDoubleMode { get; set; } = true;
 
-        public int MaxIteration { get; set; } = 1000;
+        public int MaxIteration { get; set; } = 100000;
 
         public PixelMandelViewModel(int width=400, int heigth=400)
         {
@@ -173,12 +173,12 @@ namespace MRFractal
                 var rnd = new Random();
                 for (int i = 0; i < 100; i++)
                 {
-                    int x = rnd.Next(pixelWidth);
-                    int y = rnd.Next(pixelHeigth);
+                    var x = rnd.Next(pixelWidth);
+                    var y = rnd.Next(pixelHeigth);
                     if (this.PerPixelDepthStore.isRealData[x, y] == false)
                     {
-                        var xx = XPixelToReal(x);
-                        var yy = YPixelToIm(y);
+                        var xx = XPixelToReal(x) + (rnd.NextDouble()-0.5)*PixelSize.real;
+                        var yy = YPixelToIm(y) + (rnd.NextDouble() - 0.5) * PixelSize.imaginar;
                         //int depth = MandelFractal.Julia(xx, yy, xx, yy, 1000);
                         int depth = NativDoubleMode ? MandelFractal.Julia((double)xx, (double)yy, (double)xx, (double)yy, MaxIteration) : MandelFractal.JuliaBigFloat(xx, yy, xx, yy, MaxIteration);
                         this.PerPixelDepthStore.NewDepthData(x, y, depth, true);
@@ -201,8 +201,8 @@ namespace MRFractal
             this.PerPixelDepthStore.ResetIsRealData();
         }
 
-        public BigDecimal XPixelToReal(int x) => re_lefttop + x * PixelSize.real;
-        public BigDecimal YPixelToIm(int y) => im_lefttop + y * PixelSize.imaginar;
+        public BigDecimal XPixelToReal(BigDecimal x) => re_lefttop + x * PixelSize.real;
+        public BigDecimal YPixelToIm(BigDecimal y) => im_lefttop + y * PixelSize.imaginar;
 
         public void ResetPos()
         {

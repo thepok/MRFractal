@@ -197,9 +197,6 @@ namespace MRFractal
             this.model.ResetStores();
             
             return;
-
-            this.model = new PixelMandelViewModel((int)e.NewSize.Width, (int)e.NewSize.Height);
-            this.DataContext = this.model;
         }
 
 
