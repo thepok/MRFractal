@@ -6,21 +6,41 @@
         xmlns:local="clr-namespace:MRFractal"
         mc:Ignorable="d"
         Title="MainWindow"  Initialized="Window_Initialized" KeyUp="Window_KeyUp" Closing="Window_Closing"
-        Width="800" Height="600">
+        Width="800" Height="600"
+        UseLayoutRounding="True">
     <Grid>
         <DockPanel >
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_Resolution">
+                    <MenuItem Header="800 x 600" Tag="800 600" Click="ResolutionMenuItem_Click" />
+                    <MenuItem Header="1920 x 1080" Tag="1920 1080" Click="ResolutionMenuItem_Click" />
+                    <MenuItem Header="3840 × 2160" Tag="3840 2160" Click="ResolutionMenuItem_Click" />
+                    <MenuItem Header="7680 × 4320" Tag="7680 4320" Click="ResolutionMenuItem_Click" />
+                    
+                    <Separator />
+                    <MenuItem Header="Fit Window" Click="FitWindowMenuItem_Click" />
+                </MenuItem>
+                <MenuItem Header="_Export">
+                    <MenuItem Header="Save Image" Click="SaveImage_Click" />
+                </MenuItem>
+            </Menu>
             <CheckBox DockPanel.Dock="Top" IsChecked="{Binding DirectMode}">Direkt Mode</CheckBox>
             <CheckBox DockPanel.Dock="Top" IsChecked="{Binding NativDoubleMode}">Nativ Double Mode</CheckBox>
             <TextBox DockPanel.Dock="Top" x:Name="MaxIteration" Text="{Binding Path=MaxIteration}"></TextBox>
             <TextBox DockPanel.Dock="Top" x:Name="Cords"></TextBox>
-            <Grid>
-                <Image x:Name="MainImage" Stretch="Fill" MouseLeftButtonDown="MainImage_MouseLeftButtonDown" MouseMove="MainImage_MouseMove" MouseLeftButtonUp="MainImage_MouseLeftButtonUp" MouseRightButtonDown="MainImage_MouseRightButtonDown" SizeChanged="MainImage_SizeChanged" />
+            <ScrollViewer x:Name="FracScollVIew" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
+                <Grid>
+                <Image x:Name="MainImage" 
+                       RenderOptions.BitmapScalingMode="NearestNeighbor"
+                       Width="800px" Height="600px" HorizontalAlignment="Left" VerticalAlignment="Top"
+                       MouseLeftButtonDown="MainImage_MouseLeftButtonDown" MouseMove="MainImage_MouseMove" MouseLeftButtonUp="MainImage_MouseLeftButtonUp" MouseRightButtonDown="MainImage_MouseRightButtonDown" SizeChanged="MainImage_SizeChanged" />
                 <Rectangle x:Name="SelectionRectangle" Visibility="Hidden" Width="100" Height="50" Margin="322,176,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" MouseMove="MainImage_MouseMove" MouseLeftButtonUp="MainImage_MouseLeftButtonUp" MouseRightButtonDown="MainImage_MouseRightButtonDown">
                     <Rectangle.Fill>
                         <SolidColorBrush Color="Black" Opacity="0.25"/>
                     </Rectangle.Fill>
                 </Rectangle>
             </Grid>
+            </ScrollViewer>
         </DockPanel>
     </Grid>
 </Window>

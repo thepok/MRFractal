@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -268,5 +269,50 @@ namespace MRFractal
         }
 
         #endregion
+
+        private void ResolutionMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            int width = int.Parse(((string)((MenuItem)sender).Tag).Split(" ")[0]);
+            int height = int.Parse(((string)((MenuItem)sender).Tag).Split(" ")[1]);
+            
+            MainImage.Width = width;
+            MainImage.Height = height;
+
+            this.model.pixelHeigth = height;
+            this.model.pixelWidth = width;
+            this.model.ResetStores();
+        }
+
+        private void FitWindowMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MainImage.Width = 1;
+            MainImage.Height = 1;
+            this.model.pixelHeigth = (int)MainImage.Height;
+            this.model.pixelWidth = (int)MainImage.Width;
+
+            MainImage.Width = FracScollVIew.ActualWidth;
+            MainImage.Height = FracScollVIew.ActualHeight;
+            this.model.pixelHeigth = (int)MainImage.Height;
+            this.model.pixelWidth = (int)MainImage.Width;
+
+            //FracScollVIew.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+            //FracScollVIew.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+            this.model.ResetStores();
+            return;
+        }
+
+        private void SaveImage_Click(object sender, RoutedEventArgs e)
+        {
+            var pic = this.model.PerPixelColorStore.GetBitMapSource();
+
+            using (var fileStream = new FileStream("test.png", FileMode.Create))
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(pic));
+                encoder.Save(fileStream);
+            }
+            
+        }
     }
 }
