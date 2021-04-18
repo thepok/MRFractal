@@ -306,13 +306,16 @@ namespace MRFractal
         {
             var pic = this.model.PerPixelColorStore.GetBitMapSource();
 
-            using (var fileStream = new FileStream("test.png", FileMode.Create))
+            //tried Jpg...its worse than png
+            if (((string)((MenuItem)sender).Tag) == "PNG")
             {
-                BitmapEncoder encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(pic));
-                encoder.Save(fileStream);
+                using (var fileStream = new FileStream("test.png", FileMode.Create))
+                {
+                    BitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(pic));
+                    encoder.Save(fileStream);
+                }
             }
-            
         }
     }
 }

@@ -12,16 +12,19 @@
         <DockPanel >
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_Resolution">
+                    <MenuItem Header="640 x 480" Tag="640 480" Click="ResolutionMenuItem_Click" />
                     <MenuItem Header="800 x 600" Tag="800 600" Click="ResolutionMenuItem_Click" />
                     <MenuItem Header="1920 x 1080" Tag="1920 1080" Click="ResolutionMenuItem_Click" />
                     <MenuItem Header="3840 × 2160" Tag="3840 2160" Click="ResolutionMenuItem_Click" />
                     <MenuItem Header="7680 × 4320" Tag="7680 4320" Click="ResolutionMenuItem_Click" />
-                    
+                    <MenuItem Header="16000 × 8000" Tag="16000 8000" Click="ResolutionMenuItem_Click" />
+                    <MenuItem Header="24000 × 12000" Tag="24000 12000" Click="ResolutionMenuItem_Click" />
+
                     <Separator />
                     <MenuItem Header="Fit Window" Click="FitWindowMenuItem_Click" />
                 </MenuItem>
                 <MenuItem Header="_Export">
-                    <MenuItem Header="Save Image" Click="SaveImage_Click" />
+                    <MenuItem Header="Save Image" Tag="PNG" Click="SaveImage_Click" />
                 </MenuItem>
             </Menu>
             <CheckBox DockPanel.Dock="Top" IsChecked="{Binding DirectMode}">Direkt Mode</CheckBox>
