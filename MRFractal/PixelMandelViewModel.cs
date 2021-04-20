@@ -7,11 +7,8 @@ namespace MRFractal
 {
     public class PixelMandelViewModel
     {
-        public BigDecimal im_lefttop = -2;
-        public BigDecimal re_lefttop = -2;
-
-        public BigDecimal im_rightbottom = 2;
-        public BigDecimal re_rightbottom = 2;
+        public Cords LeftTop=new Cords() {imaginar=-2, real=-2 };
+        public Cords RightBottom = new Cords() { imaginar = 2, real = 2 };
 
         public int  pixelWidth = 400;
         public int pixelHeigth = 400;
@@ -65,8 +62,8 @@ namespace MRFractal
             {
                 return new Cords()
                 {
-                    imaginar = im_lefttop + Size.imaginar / 2,
-                    real = re_lefttop + Size.real / 2
+                    imaginar = LeftTop.imaginar + Size.imaginar / 2,
+                    real = LeftTop.real + Size.real / 2
                 };
             }
         }
@@ -77,8 +74,8 @@ namespace MRFractal
             {
                 return new Cords()
                 {
-                    imaginar = (im_rightbottom - im_lefttop),
-                    real = (re_rightbottom - re_lefttop)
+                    imaginar = (RightBottom.imaginar - LeftTop.imaginar),
+                    real = (RightBottom.real - LeftTop.real)
                 };
             }
         }
@@ -103,18 +100,18 @@ namespace MRFractal
                 var x = point.X;
                 var y = point.Y;
 
-                var re_size = (re_rightbottom - re_lefttop)/2;
-                var im_size = (im_rightbottom - im_lefttop)/2;
+                var re_size = (RightBottom.real - LeftTop.real)/2;
+                var im_size = (RightBottom.imaginar - LeftTop.imaginar)/2;
 
 
                 var re_newCenter = XPixelToReal((int)point.X);
                 var im_newCenter = YPixelToIm((int)point.Y);
 
-                re_lefttop = re_newCenter - re_size;
-                im_lefttop = im_newCenter - im_size;
+                LeftTop.real = re_newCenter - re_size;
+                LeftTop.imaginar = im_newCenter - im_size;
 
-                re_rightbottom = re_newCenter + re_size;
-                im_rightbottom = im_newCenter + im_size;
+                RightBottom.real = re_newCenter + re_size;
+                RightBottom.imaginar = im_newCenter + im_size;
             }
 
             ResetStores();
@@ -136,12 +133,9 @@ namespace MRFractal
             var size = Size;
             var newSize = new Cords() { imaginar = Size.imaginar / factor, real = Size.real / factor };
 
-            this.re_rightbottom = center.real + (newSize.real / 2);
-            this.im_rightbottom = center.imaginar + (newSize.imaginar / 2);
+            RightBottom = new Cords() { real = center.real + (newSize.real / 2), imaginar = center.imaginar + (newSize.imaginar / 2) };
 
-            this.re_lefttop = center.real - (newSize.real / 2);
-            this.im_lefttop = center.imaginar - (newSize.imaginar / 2);
-
+            LeftTop = new Cords() { real = center.real - (newSize.real / 2), imaginar = center.imaginar - (newSize.imaginar / 2) };
 
             PerPixelDepthStore.Zoom(factor);
         }
@@ -201,15 +195,15 @@ namespace MRFractal
             this.PerPixelDepthStore.Reset();
         }
 
-        public BigDecimal XPixelToReal(BigDecimal x) => re_lefttop + x * PixelSize.real;
-        public BigDecimal YPixelToIm(BigDecimal y) => im_lefttop + y * PixelSize.imaginar;
+        public BigDecimal XPixelToReal(BigDecimal x) => LeftTop.real + x * PixelSize.real;
+        public BigDecimal YPixelToIm(BigDecimal y) => LeftTop.imaginar + y * PixelSize.imaginar;
 
         public void ResetPos()
         {
-            this.im_lefttop = -2;
-            this.re_lefttop = -2;
-            this.re_rightbottom = 2;
-            this.im_rightbottom = 2;
+
+            LeftTop = new Cords() { imaginar = -2, real = -2 };
+            RightBottom = new Cords() { imaginar = 2, real = 2 };
+
             ResetPerPixelDepthMap();
         }
 

@@ -233,11 +233,11 @@ namespace MRFractal
 
                 var newLeftTop = new Cords() {real= model.XPixelToReal((int)MouseLeftDownPos.X), imaginar = model.YPixelToIm((int)MouseLeftDownPos.Y) };
                 var newRightBottom= new Cords() { real = model.XPixelToReal((int)PosClickUp.X), imaginar = model.YPixelToIm((int)PosClickUp.Y) };
-                model.re_rightbottom = newRightBottom.real;
-                model.im_rightbottom = newRightBottom.imaginar;
+                model.RightBottom = newRightBottom;
+                
 
-                model.re_lefttop = newLeftTop.real;
-                model.im_lefttop = newLeftTop.imaginar;
+                model.LeftTop = newLeftTop;
+                
 
                 model.ResetPerPixelDepthMap();
             }

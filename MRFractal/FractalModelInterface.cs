@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace MRFractal
 {
-    public struct Cords
+    interface FractalModelInterface
     {
-        public BigDecimal real;
-        public BigDecimal imaginar;
     }
 }
