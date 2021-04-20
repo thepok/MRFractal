@@ -177,9 +177,10 @@ namespace MRFractal
                 model.Zoom(0.5);
             }
 
-            if (e.Key == Key.Add)
+            if (e.Key == Key.Add || e.Key==Key.OemPlus)
             {
                 model.NewMaxIteraition((int)(model.MaxIteration * 1.1) + 1);
+                MaxIteration.Text = model.MaxIteration.ToString();
             }
 
         }
@@ -251,7 +252,7 @@ namespace MRFractal
         private void MainImage_MouseMove(object sender, MouseEventArgs e)
         {
             var PosClick = e.GetPosition((IInputElement)MainImage);
-            Cords.Text = $"Re:{model.XPixelToReal((int)PosClick.X)} Im:{model.YPixelToIm((int)PosClick.Y)}";
+            Cords.Text = $"Re:{model.XPixelToReal((int)PosClick.X)} Im:{model.YPixelToIm((int)PosClick.Y)} Iterations:{model.PerPixelDepthStore[(int)PosClick.X, (int)PosClick.Y]}";
             try
             {
                 if (LeftMouseButtonDown)
@@ -269,6 +270,8 @@ namespace MRFractal
         }
 
         #endregion
+
+        #region Menu
 
         private void ResolutionMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -317,5 +320,7 @@ namespace MRFractal
                 }
             }
         }
+
+        #endregion
     }
 }

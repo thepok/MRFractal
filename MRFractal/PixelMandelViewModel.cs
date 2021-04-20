@@ -23,7 +23,7 @@ namespace MRFractal
 
         public PerPixelColorStore PerPixelColorStore;
 
-        PerPixelDepthStore PerPixelDepthStore;
+        public PerPixelDepthStore PerPixelDepthStore;
 
 
         bool directMode = true;
@@ -175,7 +175,7 @@ namespace MRFractal
                 {
                     var x = rnd.Next(pixelWidth);
                     var y = rnd.Next(pixelHeigth);
-                    if (this.PerPixelDepthStore.isRealData[x, y] == false)
+                    //if (this.PerPixelDepthStore.isRealData[x, y] == false)
                     {
                         var xx = XPixelToReal(x) + (rnd.NextDouble()-0.5)*PixelSize.real;
                         var yy = YPixelToIm(y) + (rnd.NextDouble() - 0.5) * PixelSize.imaginar;
@@ -198,7 +198,7 @@ namespace MRFractal
         public void NewMaxIteraition(int newMax)
         {
             this.MaxIteration = newMax;
-            this.PerPixelDepthStore.ResetIsRealData();
+            this.PerPixelDepthStore.Reset();
         }
 
         public BigDecimal XPixelToReal(BigDecimal x) => re_lefttop + x * PixelSize.real;
