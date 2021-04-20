@@ -252,7 +252,11 @@ namespace MRFractal
         private void MainImage_MouseMove(object sender, MouseEventArgs e)
         {
             var PosClick = e.GetPosition((IInputElement)MainImage);
-            Cords.Text = $"Re:{model.XPixelToReal((int)PosClick.X)} Im:{model.YPixelToIm((int)PosClick.Y)} Iterations:{model.PerPixelDepthStore[(int)PosClick.X, (int)PosClick.Y]}";
+            try
+            {
+                Cords.Text = $"Re:{model.XPixelToReal((int)PosClick.X)} Im:{model.YPixelToIm((int)PosClick.Y)} Iterations:{model.PerPixelDepthStore[(int)PosClick.X, (int)PosClick.Y]}";
+            }
+            catch { }
             try
             {
                 if (LeftMouseButtonDown)
