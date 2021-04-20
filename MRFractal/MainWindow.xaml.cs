@@ -231,8 +231,8 @@ namespace MRFractal
             else
             {
 
-                var newLeftTop = new Cords() {real= model.XPixelToReal((int)MouseLeftDownPos.X), imaginar = model.YPixelToIm((int)MouseLeftDownPos.Y) };
-                var newRightBottom= new Cords() { real = model.XPixelToReal((int)PosClickUp.X), imaginar = model.YPixelToIm((int)PosClickUp.Y) };
+                var newLeftTop = new BigComplex() {real= model.XPixelToReal((int)MouseLeftDownPos.X), imaginar = model.YPixelToIm((int)MouseLeftDownPos.Y) };
+                var newRightBottom= new BigComplex() { real = model.XPixelToReal((int)PosClickUp.X), imaginar = model.YPixelToIm((int)PosClickUp.Y) };
                 model.RightBottom = newRightBottom;
                 
 

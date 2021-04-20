@@ -7,8 +7,8 @@ namespace MRFractal
 {
     public class PixelMandelViewModel
     {
-        public Cords LeftTop=new Cords() {imaginar=-2, real=-2 };
-        public Cords RightBottom = new Cords() { imaginar = 2, real = 2 };
+        public BigComplex LeftTop=new BigComplex() {imaginar=-2, real=-2 };
+        public BigComplex RightBottom = new BigComplex() { imaginar = 2, real = 2 };
 
         public int  pixelWidth = 400;
         public int pixelHeigth = 400;
@@ -56,11 +56,11 @@ namespace MRFractal
         }
 
 
-        Cords Center
+        BigComplex Center
         {
             get
             {
-                return new Cords()
+                return new BigComplex()
                 {
                     imaginar = LeftTop.imaginar + Size.imaginar / 2,
                     real = LeftTop.real + Size.real / 2
@@ -68,11 +68,11 @@ namespace MRFractal
             }
         }
 
-        Cords Size
+        BigComplex Size
         {
             get
             {
-                return new Cords()
+                return new BigComplex()
                 {
                     imaginar = (RightBottom.imaginar - LeftTop.imaginar),
                     real = (RightBottom.real - LeftTop.real)
@@ -80,11 +80,11 @@ namespace MRFractal
             }
         }
 
-        Cords PixelSize
+        BigComplex PixelSize
         {
             get
             {
-                return new Cords()
+                return new BigComplex()
                 {
                     imaginar = Size.imaginar / pixelHeigth,
                     real = Size.real / pixelWidth
@@ -100,18 +100,13 @@ namespace MRFractal
                 var x = point.X;
                 var y = point.Y;
 
-                var re_size = (RightBottom.real - LeftTop.real)/2;
-                var im_size = (RightBottom.imaginar - LeftTop.imaginar)/2;
 
+                BigComplex Size = (RightBottom - LeftTop) / 2;
 
-                var re_newCenter = XPixelToReal((int)point.X);
-                var im_newCenter = YPixelToIm((int)point.Y);
+                var newCenter = PixelPosToComplex((int)x, (int)y);
 
-                LeftTop.real = re_newCenter - re_size;
-                LeftTop.imaginar = im_newCenter - im_size;
-
-                RightBottom.real = re_newCenter + re_size;
-                RightBottom.imaginar = im_newCenter + im_size;
+                LeftTop = newCenter-Size;
+                RightBottom = newCenter + Size;
             }
 
             ResetStores();
@@ -131,11 +126,11 @@ namespace MRFractal
         {
             var center = Center;
             var size = Size;
-            var newSize = new Cords() { imaginar = Size.imaginar / factor, real = Size.real / factor };
+            var newSize = new BigComplex() { imaginar = Size.imaginar / factor, real = Size.real / factor };
 
-            RightBottom = new Cords() { real = center.real + (newSize.real / 2), imaginar = center.imaginar + (newSize.imaginar / 2) };
+            RightBottom = new BigComplex() { real = center.real + (newSize.real / 2), imaginar = center.imaginar + (newSize.imaginar / 2) };
 
-            LeftTop = new Cords() { real = center.real - (newSize.real / 2), imaginar = center.imaginar - (newSize.imaginar / 2) };
+            LeftTop = new BigComplex() { real = center.real - (newSize.real / 2), imaginar = center.imaginar - (newSize.imaginar / 2) };
 
             PerPixelDepthStore.Zoom(factor);
         }
@@ -198,11 +193,14 @@ namespace MRFractal
         public BigDecimal XPixelToReal(BigDecimal x) => LeftTop.real + x * PixelSize.real;
         public BigDecimal YPixelToIm(BigDecimal y) => LeftTop.imaginar + y * PixelSize.imaginar;
 
+        public BigComplex PixelPosToComplex(int x, int y) => new BigComplex() { real = XPixelToReal(x), imaginar = YPixelToIm(y) };
+
+
         public void ResetPos()
         {
 
-            LeftTop = new Cords() { imaginar = -2, real = -2 };
-            RightBottom = new Cords() { imaginar = 2, real = 2 };
+            LeftTop = new BigComplex() { imaginar = -2, real = -2 };
+            RightBottom = new BigComplex() { imaginar = 2, real = 2 };
 
             ResetPerPixelDepthMap();
         }
