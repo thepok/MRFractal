@@ -27,7 +27,12 @@
                     <MenuItem Header="Save Image" Tag="PNG" Click="SaveImage_Click" />
                 </MenuItem>
             </Menu>
-            <CheckBox DockPanel.Dock="Top" IsChecked="{Binding DirectMode}">Direkt Mode</CheckBox>
+            <DockPanel DockPanel.Dock="Top">
+                
+                    
+                <TextBox DockPanel.Dock="Right" Text="{Binding ElementName=ZoomSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right" Width="40" />
+                <Slider  x:Name="ZoomSlider"  Minimum="0.1" Maximum="10" ValueChanged="ZoomSlider_ValueChanged" Value="1"/>
+            </DockPanel>
             <CheckBox DockPanel.Dock="Top" IsChecked="{Binding NativDoubleMode}">Nativ Double Mode</CheckBox>
             <TextBox DockPanel.Dock="Top" x:Name="MaxIteration" Text="{Binding Path=MaxIteration}"></TextBox>
             <TextBox DockPanel.Dock="Top" x:Name="Cords"></TextBox>

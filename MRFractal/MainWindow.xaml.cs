@@ -51,7 +51,7 @@ namespace MRFractal
         {
 
 
-            model = new PixelMandelViewModel(100, 100);
+            model = new PixelMandelViewModel(800, 600);
             this.DataContext = model;
             //{
             //    for (int i = 0; i < 1; i++)
@@ -133,7 +133,8 @@ namespace MRFractal
         private async void  MainImage_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             var PosClick = e.GetPosition((IInputElement)sender);
-
+            PosClick.X /= ZoomSlider.Value;
+            PosClick.Y /= ZoomSlider.Value;
             model.NewCenterByPixelPos(PosClick);
 
             //Console.WriteLine($"{model.size} {model.re_center} {model.im_center}");
@@ -194,9 +195,9 @@ namespace MRFractal
 
         private void MainImage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.model.pixelHeigth = (int)e.NewSize.Height;
-            this.model.pixelWidth = (int)e.NewSize.Width;
-            this.model.ResetStores();
+            //this.model.pixelHeigth = (int)e.NewSize.Height;
+            //this.model.pixelWidth = (int)e.NewSize.Width;
+            //this.model.ResetStores();
             
             return;
         }
@@ -204,6 +205,11 @@ namespace MRFractal
 
 
         #region MOUSE
+
+        private Point PointAdjustedByZoom(Point ZoomedPoint)
+        {
+            return new Point(ZoomedPoint.X / ZoomSlider.Value, ZoomedPoint.Y / ZoomSlider.Value);
+        }
 
         System.Windows.Point MouseLeftDownPos;
         bool LeftMouseButtonDown = false;
@@ -223,16 +229,18 @@ namespace MRFractal
 
             if (PosClickUp == MouseLeftDownPos)
             {
-                model.NewCenterByPixelPos(PosClickUp);
+                model.NewCenterByPixelPos(PointAdjustedByZoom(PosClickUp));
                 //model.im_size /= 2;
                 //model.re_size /= 2;
                 model.Zoom(2);
             }
             else
             {
+                var MouseLeftDownAdjustedByZoom = PointAdjustedByZoom(MouseLeftDownPos);
+                var MouseLeftUpAdjustedByZoom = PointAdjustedByZoom(PosClickUp);
 
-                var newLeftTop = new BigComplex() {real= model.XPixelToReal((int)MouseLeftDownPos.X), imaginar = model.YPixelToIm((int)MouseLeftDownPos.Y) };
-                var newRightBottom= new BigComplex() { real = model.XPixelToReal((int)PosClickUp.X), imaginar = model.YPixelToIm((int)PosClickUp.Y) };
+                var newLeftTop = new BigComplex() {real= model.XPixelToReal((int)MouseLeftDownAdjustedByZoom.X), imaginar = model.YPixelToIm((int)MouseLeftDownAdjustedByZoom.Y) };
+                var newRightBottom= new BigComplex() { real = model.XPixelToReal((int)MouseLeftUpAdjustedByZoom.X), imaginar = model.YPixelToIm((int)MouseLeftUpAdjustedByZoom.Y) };
                 model.RightBottom = newRightBottom;
                 
 
@@ -252,9 +260,11 @@ namespace MRFractal
         private void MainImage_MouseMove(object sender, MouseEventArgs e)
         {
             var PosClick = e.GetPosition((IInputElement)MainImage);
+            var PosClickAdjustedByZoom = PointAdjustedByZoom(PosClick);
+
             try
             {
-                Cords.Text = $"Re:{model.XPixelToReal((int)PosClick.X)} Im:{model.YPixelToIm((int)PosClick.Y)} Iterations:{model.PerPixelDepthStore[(int)PosClick.X, (int)PosClick.Y]}";
+                Cords.Text = $"Re:{model.XPixelToReal((int)PosClickAdjustedByZoom.X)} Im:{model.YPixelToIm((int)PosClickAdjustedByZoom.Y)} Iterations:{model.PerPixelDepthStore[(int)PosClickAdjustedByZoom.X, (int)PosClickAdjustedByZoom.Y]}";
             }
             catch { }
             try
@@ -282,8 +292,8 @@ namespace MRFractal
             int width = int.Parse(((string)((MenuItem)sender).Tag).Split(" ")[0]);
             int height = int.Parse(((string)((MenuItem)sender).Tag).Split(" ")[1]);
             
-            MainImage.Width = width;
-            MainImage.Height = height;
+            MainImage.Width = width/ZoomSlider.Value;
+            MainImage.Height = height / ZoomSlider.Value;
 
             this.model.pixelHeigth = height;
             this.model.pixelWidth = width;
@@ -326,5 +336,14 @@ namespace MRFractal
         }
 
         #endregion
+
+        private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (MainImage != null)
+            {
+                MainImage.Width = e.NewValue * this.model.pixelWidth;
+                MainImage.Height = e.NewValue* this.model.pixelHeigth;
+            }
+        }
     }
 }
