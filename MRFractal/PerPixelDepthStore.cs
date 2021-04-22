@@ -61,9 +61,9 @@ namespace MRFractal
 
             if (BigPlot)
             {
-                for (int dx = -20; dx <= 20; dx++)
+                for (int dx = -10; dx <= 10; dx++)
                 {
-                    for (int dy = -20; dy <= 20; dy++)
+                    for (int dy = -10; dy <= 10; dy++)
                     {
                         var new_x = x + dx;
                         var new_y = y + dy;
