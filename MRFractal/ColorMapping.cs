@@ -65,21 +65,21 @@ namespace MRFractal
         private void RandomFill()
         {
             int Size = 1000;
-            var rnd = new Random();
+            var rnd = new MyRng(Math.Abs( (int)System.DateTime.Now.Ticks % int.MaxValue));
 
             Reds = new byte[Size];
             Greens = new byte[Size];
             Blues = new byte[Size];
 
-            Reds[0] = (byte)rnd.Next(255);
-            Greens[0] = (byte)rnd.Next(255);
-            Blues[0] = (byte)rnd.Next(255);
+            Reds[0] = (byte)rnd.NextInt(255);
+            Greens[0] = (byte)rnd.NextInt(255);
+            Blues[0] = (byte)rnd.NextInt(255);
 
             for (int i = 1; i < Size; i++)
             {
-                Reds[i] = Normalize(Reds[i - 1] + 5 * (rnd.Next(11) - 5));
-                Greens[i] = Normalize(Greens[i - 1] + 5 * (rnd.Next(11) - 5));
-                Blues[i] = Normalize(Blues[i - 1] + 5 * (rnd.Next(11) - 5));
+                Reds[i] = Normalize(Reds[i - 1] + 5 * (rnd.NextInt(11) - 5));
+                Greens[i] = Normalize(Greens[i - 1] + 5 * (rnd.NextInt(11) - 5));
+                Blues[i] = Normalize(Blues[i - 1] + 5 * (rnd.NextInt(11) - 5));
 
                 //Reds[i] = (byte)rnd.Next(255);
                 //Greens[i] = (byte)rnd.Next(255);
