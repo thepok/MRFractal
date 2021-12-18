@@ -247,7 +247,7 @@ namespace MRFractal
                 model.LeftTop = newLeftTop;
                 
 
-                model.ResetPerPixelDepthMap();
+                model.ResetStores();
             }
 
             //Console.WriteLine($"{model.size} {model.re_center} {model.im_center}");

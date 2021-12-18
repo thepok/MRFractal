@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -55,7 +56,7 @@ namespace MRFractal
         {
             ResetPerPixelDepthMap();
             PerPixelColorStore = new PerPixelColorStore(pixelWidth, pixelHeigth);
-            WorkProvider = GetNextWork();
+            WorkProvider = GetNextWorkCenterbased();
         }
 
 
@@ -163,6 +164,43 @@ namespace MRFractal
         object WorkLock = new object();
         IEnumerator<(int x, int y)> WorkProvider;
 
+
+        public IEnumerator<(int x, int y)> GetNextWorkCenterbased()
+        {
+            while (true)
+            {
+                int centerX = pixelWidth / 2;
+                int centerY = pixelHeigth / 2;
+                yield return new(centerX, centerY);
+
+                for(int ring=1;ring<Math.Max(pixelWidth/2+1, pixelHeigth/2+1);ring ++)
+                {
+                    for(int dx=-ring; dx<=ring;dx++)
+                    {
+                        int nextX = centerX - dx;
+                        if (nextX >= 0 && nextX < pixelWidth)
+                        {
+                            if(centerY - ring>=0)
+                                yield return new(nextX, centerY - ring);
+                            if(centerY + ring<pixelHeigth)
+                                yield return new(nextX, centerY + ring);
+                        }
+                    }
+                    for (int dy = -ring; dy <= ring; dy++)
+                    {
+                        int nextY = centerY - dy;
+                        if (nextY >= 0 && nextY < pixelHeigth)
+                        {
+                            if (centerX - ring >= 0)
+                                yield return new(centerX - ring, nextY);
+                            if (centerX + ring < pixelWidth)
+                                yield return new(centerX + ring, nextY);
+                        }
+                    }
+                }
+            }
+        }
+
         public IEnumerator<(int x, int y)> GetNextWork()
         {
             while (true)
@@ -193,7 +231,9 @@ namespace MRFractal
                         for (int k = 0; k < 1000; k++)
                         {
                             WorkProvider.MoveNext();
-                            x = WorkProvider.Current.x;
+
+
+                                x = WorkProvider.Current.x;
                             y = WorkProvider.Current.y;
                             WorkBatch.Push(new(x, y));
                         }
@@ -201,18 +241,32 @@ namespace MRFractal
                     
                     foreach(var ele in WorkBatch)
                     {
-                        x = ele.x;
-                        y = ele.y;
-                        var xx = XPixelToReal(x) + ((rnd.NextDouble()-0.5)/4) * PixelSize.real;
-                        var yy = YPixelToIm(y) + ((rnd.NextDouble() - 0.5)/4) * PixelSize.imaginar;
-                        //int depth = MandelFractal.Julia(xx, yy, xx, yy, 1000);
-                        int depth = NativDoubleMode ? MandelFractal.Julia((double)xx, (double)yy, (double)xx, (double)yy, MaxIteration) : MandelFractal.JuliaBigFloat(xx, yy, xx, yy, MaxIteration);
-                        this.PerPixelDepthStore.NewDepthData(x, y, depth, false);
-
+                        //for (int i = 0; i < 30; i++) //Supersample on Spot?
+                        {
+                            x = ele.x;
+                            y = ele.y;
+                            BigDecimal xx;
+                            BigDecimal yy;
+                            if (PerPixelDepthStore.Data[x, y].IsRealData==false)
+                            {
+                                xx = XPixelToReal(x);
+                                yy = YPixelToIm(y);
+                            }
+                            else//supersample
+                            {
+                                xx = XPixelToReal(x) + ((rnd.NextDouble() - 0.5) / 1) * PixelSize.real;
+                                yy = YPixelToIm(y) + ((rnd.NextDouble() - 0.5) / 1) * PixelSize.imaginar;
+                            }
+                            //int depth = MandelFractal.Julia(xx, yy, xx, yy, 1000);
+                            int depth = NativDoubleMode ? MandelFractal.Julia((double)xx, (double)yy, (double)xx, (double)yy, MaxIteration) : MandelFractal.JuliaBigFloat(xx, yy, xx, yy, MaxIteration);
+                            this.PerPixelDepthStore.NewDepthData(x, y, depth, false);
+                        }
                     }
                 }
             }
-            catch { };
+            catch (Exception e ){
+                Console.WriteLine(e.Message);
+            };
         }
 
         public void NewColorMapping()

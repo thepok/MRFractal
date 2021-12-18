@@ -19,7 +19,7 @@ namespace MRFractal
         public int pixelWidth;
         public int pixelHeigth;
 
-        private PerPixelDepthStoreElement[,] Data;
+        public PerPixelDepthStoreElement[,] Data;
 
         public int this[int x, int y]
         {
